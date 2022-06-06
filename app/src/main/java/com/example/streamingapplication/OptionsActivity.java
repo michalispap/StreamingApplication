@@ -1,9 +1,12 @@
 package com.example.streamingapplication;
+
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -12,9 +15,16 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class OptionsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -39,6 +49,8 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
+
+        new Task().execute((String) b.get("channelName"));
     }
 
     @Override
@@ -153,7 +165,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         }
     }
 
-    public void Choice(View view) {
+    public void Choice(View view) throws IOException {
         Button textButton = (Button) findViewById(R.id.textBtn);
         Button multimediaButton = (Button) findViewById(R.id.galleryBtn);
         Button cameraButton = (Button) findViewById(R.id.cameraBtn);
@@ -179,6 +191,34 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             cameraVideoButton.setVisibility(View.GONE);
             //update broker info
         }
+    }
+
+    public class Task extends AsyncTask<String, Void, Void> {
+
+        String Ip;
+        int port;
+        int type;
+        InetAddress inetAddress;
+        Address address = null;
+        int action ;
+        HashMap<Address, ArrayList<String>> brokersList;
+
+        String channelName; //from parameters
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            channelName = strings[0];
+            //error lines
+            Publisher pub = new Publisher(address, channelName);
+            Consumer con = new Consumer(address);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            AppNode.brokersList.forEach((k,v) -> Toast.makeText(OptionsActivity.this, "Address: " + k + ", Topics: " +  v, Toast.LENGTH_SHORT).show());
+        }
+
     }
 
 }
