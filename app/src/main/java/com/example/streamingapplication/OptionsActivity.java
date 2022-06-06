@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +48,21 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
+    }
+
+    public void openText(View view) {
+        EditText message = (EditText) findViewById(R.id.message);
+        Button textButton = (Button) findViewById(R.id.textBtn);
+        String ButtonText = textButton.getText().toString();
+        if (ButtonText.equals("Text")) {
+            message.setVisibility(View.VISIBLE);
+            textButton.setText("Send");
+        }
+        else if (ButtonText.equals("Send")) {
+            Toast.makeText(this, message.getText().toString(), Toast.LENGTH_SHORT).show();
+            message.setVisibility(View.GONE);
+            textButton.setText("Text");
+        }
     }
 
     public void openGallery(View view) {

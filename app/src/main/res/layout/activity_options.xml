@@ -99,11 +99,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
         android:layout_marginBottom="144dp"
-        android:text="Text"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         android:backgroundTint="@android:color/holo_orange_light"
-        android:visibility="gone"/>
+        android:onClick="openText"
+        android:text="Text"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/galleryBtn"
@@ -149,5 +150,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cameraBtn"
         app:layout_constraintVertical_bias="1.0" />
+
+    <EditText
+        android:id="@+id/message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="27dp"
+        android:layout_marginEnd="101dp"
+        android:ems="10"
+        android:hint="Enter message..."
+        android:inputType="textLongMessage"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chooseBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
