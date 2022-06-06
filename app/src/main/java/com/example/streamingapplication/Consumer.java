@@ -168,7 +168,7 @@ public class Consumer{
                                     Value chunkInValue = (Value)in.readObject();
                                     MultimediaFile chunk = chunkInValue.getMultimediaFile();
                                     saveChunk(chunk,file);
-                                    System.out.println("GOT CHUNK");
+                                    System.out.println("GOT CHUNK!");
                                     if(chunkInValue.isLast){
                                         System.out.println("Received whole File...");
                                         break;
