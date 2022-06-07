@@ -20,8 +20,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,6 +36,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
     private static final int PERMISSION_CODE = 1001;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_VIDEO_CAPTURE = 2;
+    int port;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +46,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         Bundle b = i.getExtras();
         TextView portNumber = findViewById(R.id.channelString);
         portNumber.setText((String) b.get("port"));
+        port = Integer.parseInt((String) b.get("port"));
         TextView channelName = findViewById(R.id.portNumber);
         channelName.setText((String) b.get("channelName"));
         Spinner spinner = findViewById(R.id.options_spinner);
@@ -196,7 +201,6 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
     public class Task extends AsyncTask<String, Void, Void> {
 
         String Ip;
-        int port;
         int type;
         InetAddress inetAddress;
         Address address = null;
@@ -207,8 +211,18 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
         @Override
         protected Void doInBackground(String... strings) {
+            final DatagramSocket dSocket;
+            try {
+                dSocket = new DatagramSocket();
+                dSocket.connect(InetAddress.getByName("8.8.8.8"),10002);
+                address = new Address(dSocket.getLocalAddress().getHostAddress(), port);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+
             channelName = strings[0];
-            //error lines
             Publisher pub = new Publisher(address, channelName);
             Consumer con = new Consumer(address);
             return null;
