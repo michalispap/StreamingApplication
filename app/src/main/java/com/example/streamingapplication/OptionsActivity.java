@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,20 +15,16 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 public class OptionsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -70,8 +65,8 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
     }
 
     public void openText(View view) {
-        EditText message = (EditText) findViewById(R.id.message);
-        Button textButton = (Button) findViewById(R.id.textBtn);
+        EditText message = findViewById(R.id.message);
+        Button textButton = findViewById(R.id.textBtn);
         String ButtonText = textButton.getText().toString();
         if (ButtonText.equals("Text")) {
             message.setVisibility(View.VISIBLE);
@@ -172,13 +167,13 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         }
     }
 
-    public void Choice(View view) throws IOException {
-        Button textButton = (Button) findViewById(R.id.textBtn);
-        Button multimediaButton = (Button) findViewById(R.id.galleryBtn);
-        Button cameraButton = (Button) findViewById(R.id.cameraBtn);
-        Button cameraVideoButton = (Button) findViewById(R.id.cameraVideoBtn);
-        Button topicsButton = (Button) findViewById(R.id.topicsBtn);
-        ListView topicsList = (ListView) findViewById(R.id.topics_list);
+    public void Choice(View view) {
+        Button textButton = findViewById(R.id.textBtn);
+        Button multimediaButton = findViewById(R.id.galleryBtn);
+        Button cameraButton = findViewById(R.id.cameraBtn);
+        Button cameraVideoButton = findViewById(R.id.cameraVideoBtn);
+        Button topicsButton = findViewById(R.id.topicsBtn);
+        ListView topicsList = findViewById(R.id.topics_list);
         if (item.equals("Publisher")) {
             textButton.setVisibility(View.VISIBLE);
             multimediaButton.setVisibility(View.VISIBLE);
@@ -199,7 +194,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
     }
 
     public void updateBrokerInfo(View view) {
-        Button updateBrokers = (Button) findViewById(R.id.updateBrokers);
+        Button updateBrokers = findViewById(R.id.updateBrokers);
         Toast.makeText(this, updateBrokers.getText().toString(), Toast.LENGTH_SHORT).show();
     }
 
@@ -218,7 +213,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
         String channelName; //from parameters
 
-        ArrayList<String> topicsArray = new ArrayList<String>();
+        ArrayList<String> topicsArray = new ArrayList<>();
 
         @Override
         protected Void doInBackground(String... strings) {
@@ -227,9 +222,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
                 dSocket = new DatagramSocket();
                 dSocket.connect(InetAddress.getByName("8.8.8.8"),10002);
                 address = new Address(dSocket.getLocalAddress().getHostAddress(), port);
-            } catch (SocketException e) {
-                e.printStackTrace();
-            } catch (UnknownHostException e) {
+            } catch (SocketException | UnknownHostException e) {
                 e.printStackTrace();
             }
 
@@ -237,19 +230,15 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             Publisher pub = new Publisher(address, channelName);
             Consumer con = new Consumer(address);
 
-            AppNode.brokersList.forEach((k,v) -> {
-                for (int i=0; i<v.size(); i++) {
-                    topicsArray.add(v.get(i));
-                }
-            });
+            AppNode.brokersList.forEach((k, v) -> topicsArray.addAll(v)); //NullPointerException
 
             return null;
         }
 
         @Override
         protected void onPostExecute(Void unused) {
-            ArrayAdapter listAdapter = new ArrayAdapter<String>(OptionsActivity.this, R.layout.activity_listview, topicsArray);
-            ListView listView = (ListView) findViewById(R.id.topics_list);
+            ArrayAdapter<String> listAdapter = new ArrayAdapter<>(OptionsActivity.this, R.layout.activity_listview, topicsArray);
+            ListView listView = findViewById(R.id.topics_list);
             listView.setAdapter(listAdapter);
             listView.setVisibility(View.VISIBLE);
         }
