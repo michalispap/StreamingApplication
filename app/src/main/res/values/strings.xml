@@ -3,6 +3,5 @@
     <string-array name="options_array">
         <item>Publisher</item>
         <item>Consumer</item>
-        <item>Update Broker Information</item>
     </string-array>
 </resources>

@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +29,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class OptionsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -37,6 +39,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_VIDEO_CAPTURE = 2;
     int port;
+    String channel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,18 +47,17 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         setContentView(R.layout.activity_options);
         Intent i = getIntent();
         Bundle b = i.getExtras();
-        TextView portNumber = findViewById(R.id.channelString);
-        portNumber.setText((String) b.get("port"));
+        TextView channelName = findViewById(R.id.channelString);
         port = Integer.parseInt((String) b.get("port"));
-        TextView channelName = findViewById(R.id.portNumber);
+        TextView portNumber = findViewById(R.id.portNumber);
+        portNumber.setText((String) b.get("port"));
         channelName.setText((String) b.get("channelName"));
+        channel = (String) b.get("channelName");
         Spinner spinner = findViewById(R.id.options_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.options_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
-
-        new Task().execute((String) b.get("channelName"));
     }
 
     @Override
@@ -175,11 +177,15 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         Button multimediaButton = (Button) findViewById(R.id.galleryBtn);
         Button cameraButton = (Button) findViewById(R.id.cameraBtn);
         Button cameraVideoButton = (Button) findViewById(R.id.cameraVideoBtn);
+        Button topicsButton = (Button) findViewById(R.id.topicsBtn);
+        ListView topicsList = (ListView) findViewById(R.id.topics_list);
         if (item.equals("Publisher")) {
             textButton.setVisibility(View.VISIBLE);
             multimediaButton.setVisibility(View.VISIBLE);
             cameraButton.setVisibility(View.VISIBLE);
             cameraVideoButton.setVisibility(View.VISIBLE);
+            topicsButton.setVisibility(View.GONE);
+            topicsList.setVisibility(View.GONE);
             //publisher stuff
         }
         else if (item.equals("Consumer")) {
@@ -187,15 +193,18 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             multimediaButton.setVisibility(View.GONE);
             cameraButton.setVisibility(View.GONE);
             cameraVideoButton.setVisibility(View.GONE);
+            topicsButton.setVisibility(View.VISIBLE);
             //publisher stuff
         }
-        else if (item.equals("Update Broker Information")) {
-            textButton.setVisibility(View.GONE);
-            multimediaButton.setVisibility(View.GONE);
-            cameraButton.setVisibility(View.GONE);
-            cameraVideoButton.setVisibility(View.GONE);
-            //update broker info
-        }
+    }
+
+    public void updateBrokerInfo(View view) {
+        Button updateBrokers = (Button) findViewById(R.id.updateBrokers);
+        Toast.makeText(this, updateBrokers.getText().toString(), Toast.LENGTH_SHORT).show();
+    }
+
+    public void viewTopics(View view) {
+        new Task().execute(channel);
     }
 
     public class Task extends AsyncTask<String, Void, Void> {
@@ -208,6 +217,8 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         HashMap<Address, ArrayList<String>> brokersList;
 
         String channelName; //from parameters
+
+        ArrayList<String> topicsArray = new ArrayList<String>();
 
         @Override
         protected Void doInBackground(String... strings) {
@@ -225,12 +236,22 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             channelName = strings[0];
             Publisher pub = new Publisher(address, channelName);
             Consumer con = new Consumer(address);
+
+            AppNode.brokersList.forEach((k,v) -> {
+                for (int i=0; i<v.size(); i++) {
+                    topicsArray.add(v.get(i));
+                }
+            });
+
             return null;
         }
 
         @Override
         protected void onPostExecute(Void unused) {
-            AppNode.brokersList.forEach((k,v) -> Toast.makeText(OptionsActivity.this, "Address: " + k + ", Topics: " +  v, Toast.LENGTH_SHORT).show());
+            ArrayAdapter listAdapter = new ArrayAdapter<String>(OptionsActivity.this, R.layout.activity_listview, topicsArray);
+            ListView listView = (ListView) findViewById(R.id.topics_list);
+            listView.setAdapter(listAdapter);
+            listView.setVisibility(View.VISIBLE);
         }
 
     }

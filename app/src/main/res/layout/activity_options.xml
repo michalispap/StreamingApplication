@@ -166,4 +166,48 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chooseBtn" />
 
+    <Button
+        android:id="@+id/updateBrokers"
+        android:layout_width="132dp"
+        android:layout_height="72dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="5dp"
+        android:backgroundTint="#009688"
+        android:onClick="updateBrokerInfo"
+        android:text="Update Broker Info"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/chooseBtn"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.606" />
+
+    <Button
+        android:id="@+id/topicsBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="84dp"
+        android:layout_marginEnd="125dp"
+        android:backgroundTint="#FFB907"
+        android:onClick="viewTopics"
+        android:text="View Topics"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/updateBrokers"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/choose_option_box" />
+
+    <ListView
+        android:id="@+id/topics_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="150dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/updateBrokers" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
