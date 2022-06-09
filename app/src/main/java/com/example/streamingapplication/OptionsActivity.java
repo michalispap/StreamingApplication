@@ -204,15 +204,8 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
     public class Task extends AsyncTask<String, Void, Void> {
 
-        String Ip;
-        int type;
-        InetAddress inetAddress;
         Address address = null;
-        int action ;
-        HashMap<Address, ArrayList<String>> brokersList;
-
-        String channelName; //from parameters
-
+        String channelName;
         ArrayList<String> topicsArray = new ArrayList<>();
 
         @Override
