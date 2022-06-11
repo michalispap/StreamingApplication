@@ -1,21 +1,28 @@
 package com.example.streamingapplication;
 
-/*import org.apache.tika.exception.TikaException;
+import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.mp4.MP4Parser;
-import org.apache.tika.sax.BodyContentHandler;*/
+import org.apache.tika.sax.BodyContentHandler;
 import org.xml.sax.SAXException;
-import java.io.*;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
-import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 
 public class Publisher {
 
@@ -46,14 +53,14 @@ public class Publisher {
 
     public static void main (String args[]){}
 
-    /*public HashMap<String, String> getMetadata(String file){
+    public HashMap<String, String> getMetadata(String file){
         HashMap<String, String> data = new HashMap<>();
 
         try  {
             FileInputStream f = new FileInputStream(new File(file));
             File _file = new File(file);
             long lengthInKb = (_file.length()/1024);
-            var _name = _file.getAbsolutePath().substring(57);
+            String _name = _file.getAbsolutePath().substring(57);
             System.out.println(_name +"\n"+  Long.toString(lengthInKb));
             data.put("LengthInKb" , Long.toString(lengthInKb));
             data.put("name" , _name);
@@ -88,9 +95,9 @@ public class Publisher {
         //System.out.println(data);
 
         return data;
-    }*/
+    }
 
-    /*public ArrayList<byte[]> generateChunks(File file ) throws TikaException, IOException, SAXException {
+    public ArrayList<byte[]> generateChunks(File file ) throws TikaException, IOException, SAXException {
         ArrayList<byte[]> chunks = new ArrayList<>();
         try {
             byte[] fileInBytes = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
@@ -107,7 +114,7 @@ public class Publisher {
             e.printStackTrace();
         }
         return chunks;
-    }*/
+    }
 
     public void getBrokerList() {
         Runnable task = () -> {
@@ -122,7 +129,7 @@ public class Publisher {
                 service_out.flush();
                 AppNode.brokersList = (HashMap) service_in.readObject();
                 //System.out.println("HashMap Read:\n");
-                AppNode.brokersList.forEach((k,v)
+                AppNode.brokersList.forEach((k, v)
                         -> System.out.println("Address: " + k + "   Topics:" +  v)
                 );
 
@@ -141,27 +148,27 @@ public class Publisher {
         BigInteger result = decimal.mod(BigInteger.valueOf(3));
         int mod = result.intValue();
         switch (mod) {
-            case 0:
+            case 0: {
                 System.out.println("Broker 1 will handle topic:" + topic);
                 System.out.println(Broker.getBrokerList().keySet().toArray()[0]);
-                return (Address)Broker.getBrokerList().keySet().toArray()[0];
-            case 1:
+                return (Address) Broker.getBrokerList().keySet().toArray()[0];
+            }
+            case 1: {
                 System.out.println("Broker 2 will handle topic:" + topic);
                 System.out.println(Broker.getBrokerList().keySet().toArray()[1]);
                 return (Address) Broker.getBrokerList().keySet().toArray()[1];
-            case 2:
+            }
+            case 2: {
                 System.out.println("Broker 3 will handle topic:" + topic);
                 System.out.println(Broker.getBrokerList().keySet().toArray()[2]);
                 return (Address) Broker.getBrokerList().keySet().toArray()[2];
-//            AppNode.brokersList.forEach((k,v)
-//                    -> System.out.println( "Address:"+ k + "something"+ v));
+            }
         }
-
 
         return null;
     }
 
-    /*public void sendFile(String text,ArrayList<String> hashtags , Date dateCreated) {
+    public void sendFile(String text,ArrayList<String> hashtags , Date dateCreated) {
         Runnable task = () -> {
             try {
                 hashtags.forEach(hashtag
@@ -183,8 +190,8 @@ public class Publisher {
         Thread thread = new Thread(task);
         thread.start();
 
-    }*/
-    /*public void notifyBroker(String content,String hashtag, Date dateCreated){
+    }
+    public void notifyBroker(String content,String hashtag, Date dateCreated){
         try{
             String type = null;
             Address address = hashTopic(hashtag);
@@ -198,7 +205,7 @@ public class Publisher {
 
             /// send file to broker ///
             ArrayList<byte[]> chunks = new ArrayList<>();
-            HashMap<String,String> metaMap = new HashMap<String,String>();
+            HashMap<String, String> metaMap = new HashMap<String,String>();
 
             if(content.endsWith(".mp4") || content.endsWith(".jpg")) {
                 System.out.println("GenerateChunks for video or photo");
@@ -255,7 +262,7 @@ public class Publisher {
         } catch (NoSuchAlgorithmException | IOException | TikaException | SAXException e) {
             e.printStackTrace();
         }
-    }*/
+    }
     public void push(int i , ArrayList<byte[]> chunks, Date dateCreated, String type,ObjectOutputStream serv_out) throws IOException {
 
         if(i==chunks.size()-1){

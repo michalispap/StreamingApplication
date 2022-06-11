@@ -1,6 +1,6 @@
 package com.example.streamingapplication;
 
-//import org.apache.tika.exception.TikaException;
+import org.apache.tika.exception.TikaException;
 import org.xml.sax.SAXException;
 
 import java.io.File;
@@ -27,7 +27,7 @@ public interface IPublisher extends INode {
     //------------------------------------------------------------------------------------------------------------------
 
     ProfileName profileName = null;
-    //ArrayList<MultimediaFile> generateChunks(File file) throws TikaException, IOException, SAXException;
+    ArrayList<MultimediaFile> generateChunks(File file) throws TikaException, IOException, SAXException;
     void getBrokerList();
     Address hashTopic(String s) throws NoSuchAlgorithmException;
     void notifyBrokersNewMessage(String s);

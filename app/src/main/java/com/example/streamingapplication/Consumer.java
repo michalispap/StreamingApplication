@@ -45,7 +45,7 @@ public class Consumer{
                 service_out.writeObject(new Value(this.addr, SenderType.CONSUMER,false));
 
                 AppNode.brokersList = (HashMap) service_in.readObject();
-                AppNode.brokersList.forEach((k,v)
+                AppNode.brokersList.forEach((k, v)
                         -> System.out.println("Address: " + k + "   Topics:" +  v));
 
             }catch(Exception e){
@@ -107,7 +107,7 @@ public class Consumer{
         Runnable task = () ->{
           try{
               System.out.println("Thread Show Conversation Data started...");
-              AppNode.brokersList.forEach((broker,topics)->{
+              AppNode.brokersList.forEach((broker, topics)->{
                   if(topics.contains(hashtag)){
                       Socket socketToBroker = null;
                       try{
@@ -168,7 +168,7 @@ public class Consumer{
                                     Value chunkInValue = (Value)in.readObject();
                                     MultimediaFile chunk = chunkInValue.getMultimediaFile();
                                     saveChunk(chunk,file);
-                                    System.out.println("GOT CHUNK!");
+                                    System.out.println("GOT CHUNK");
                                     if(chunkInValue.isLast){
                                         System.out.println("Received whole File...");
                                         break;

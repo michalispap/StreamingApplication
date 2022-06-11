@@ -15,16 +15,13 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class OptionsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -35,6 +32,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
     private static final int REQUEST_VIDEO_CAPTURE = 2;
     int port;
     String channel;
+    ArrayAdapter<String> listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -220,20 +218,27 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             }
 
             channelName = strings[0];
+
             Publisher pub = new Publisher(address, channelName);
             Consumer con = new Consumer(address);
 
-            AppNode.brokersList.forEach((k, v) -> topicsArray.addAll(v)); //NullPointerException
+            Broker.getBrokerList().forEach((k, v) -> topicsArray.addAll(v));
 
             return null;
         }
 
         @Override
         protected void onPostExecute(Void unused) {
-            ArrayAdapter<String> listAdapter = new ArrayAdapter<>(OptionsActivity.this, R.layout.activity_listview, topicsArray);
+            listAdapter = new ArrayAdapter<>(OptionsActivity.this, R.layout.activity_listview, topicsArray);
             ListView listView = findViewById(R.id.topics_list);
             listView.setAdapter(listAdapter);
             listView.setVisibility(View.VISIBLE);
+            listView.setOnItemClickListener((parent, view, position, id) -> {
+                String entry = (String) parent.getAdapter().getItem(position);
+                Intent intent = new Intent(OptionsActivity.this, TopicActivity.class);
+                intent.putExtra("topic", entry);
+                startActivity(intent);
+            });
         }
 
     }

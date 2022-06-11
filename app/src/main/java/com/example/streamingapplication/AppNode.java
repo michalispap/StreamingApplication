@@ -4,14 +4,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Scanner;
 
 public class AppNode {
 
@@ -26,7 +24,7 @@ public class AppNode {
     private int action ;
 
     /// USERS BROKER LIST
-    public static HashMap<Address , ArrayList<String>> brokersList;
+    public static HashMap<Address, ArrayList<String>> brokersList;
 
     public static void main (String args[]) throws IOException {
 
@@ -143,7 +141,7 @@ public class AppNode {
                     System.out.println("FileCollection:\n");
                     System.out.println(pub.getFileCollection());
 
-                    //pub.sendFile(content,hashTags,dateCreated);
+                    pub.sendFile(content,hashTags,dateCreated);
 
                 } catch (Exception e) {
                     e.printStackTrace();
