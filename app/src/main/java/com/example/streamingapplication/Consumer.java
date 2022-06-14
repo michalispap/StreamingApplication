@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -15,7 +16,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 
-public class Consumer{
+public class Consumer implements Serializable {
 
     private Socket socket;
     private ServerSocket serverSocket;
@@ -26,7 +27,7 @@ public class Consumer{
 
     protected ArrayList<Address> brokers = new ArrayList<>(Arrays.asList(
             /// first random broker IP and Port
-            new Address("192.168.1.9", 6000)
+            new Address("192.168.1.7", 6000)
     ));
 
     public Consumer(Address _addr){
