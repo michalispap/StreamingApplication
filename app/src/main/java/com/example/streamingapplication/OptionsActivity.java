@@ -177,6 +177,8 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         Button cameraVideoButton = findViewById(R.id.cameraVideoBtn);
         Button topicsButton = findViewById(R.id.topicsBtn);
         ListView topicsList = findViewById(R.id.topics_list);
+        Button registerButton = findViewById(R.id.registerBtn);
+        Button viewDataButton = findViewById(R.id.viewDataBtn);
         if (item.equals("Publisher")) {
             textButton.setVisibility(View.VISIBLE);
             multimediaButton.setVisibility(View.VISIBLE);
@@ -184,6 +186,8 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             cameraVideoButton.setVisibility(View.VISIBLE);
             topicsButton.setVisibility(View.GONE);
             topicsList.setVisibility(View.GONE);
+            registerButton.setVisibility(View.GONE);
+            viewDataButton.setVisibility(View.GONE);
             //publisher stuff
         }
         else if (item.equals("Consumer")) {
@@ -225,11 +229,15 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             ListView listView = findViewById(R.id.topics_list);
             listView.setAdapter(listAdapter);
             listView.setVisibility(View.VISIBLE);
+            Button registerButton = findViewById(R.id.registerBtn);
+            Button viewDataButton = findViewById(R.id.viewDataBtn);
             listView.setOnItemClickListener((parent, view, position, id) -> {
-                String entry = (String) parent.getAdapter().getItem(position);
+                /*String entry = (String) parent.getAdapter().getItem(position);
                 Intent intent = new Intent(OptionsActivity.this, TopicActivity.class);
                 intent.putExtra("topic", entry);
-                startActivity(intent);
+                startActivity(intent);*/
+                registerButton.setVisibility(View.VISIBLE);
+                viewDataButton.setVisibility(View.VISIBLE);
             });
         }
 
