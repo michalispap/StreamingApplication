@@ -34,6 +34,9 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
     String channel;
     ArrayAdapter<String> listAdapter;
 
+    Publisher pub;
+    Consumer cons;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +54,8 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
+        new InitTask().execute();
+
     }
 
     @Override
@@ -208,20 +213,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
         @Override
         protected Void doInBackground(String... strings) {
-            final DatagramSocket dSocket;
-            try {
-                dSocket = new DatagramSocket();
-                dSocket.connect(InetAddress.getByName("8.8.8.8"),10002);
-                address = new Address(dSocket.getLocalAddress().getHostAddress(), port);
-            } catch (SocketException | UnknownHostException e) {
-                e.printStackTrace();
-            }
-
             channelName = strings[0];
-
-            Publisher pub = new Publisher(address, channelName);
-            Consumer con = new Consumer(address);
-
             Broker.getBrokerList().forEach((k, v) -> topicsArray.addAll(v));
 
             return null;
@@ -241,6 +233,35 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             });
         }
 
+
+
+    }
+
+    public class InitTask extends AsyncTask<Void, Void, Void> {
+
+        Address address = null;
+        String channelName;
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            final DatagramSocket dSocket;
+            try {
+                dSocket = new DatagramSocket();
+                dSocket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+                address = new Address(dSocket.getLocalAddress().getHostAddress(), port);
+            } catch (SocketException | UnknownHostException e) {
+                e.printStackTrace();
+            }
+            pub = new Publisher(address, channelName);
+            cons = new Consumer(address);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+
+        }
     }
 
 }
