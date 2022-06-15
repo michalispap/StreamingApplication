@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public interface INode {
 
-    static  final Address ZookeeperAddress = new Address("192.168.1.9",5000);
+    static  final Address ZookeeperAddress = new Address("192.168.1.5",5000);
 
     ArrayList<Address> initClients = new ArrayList<>();
     //void init(Request request) throws IOException;

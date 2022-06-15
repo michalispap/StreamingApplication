@@ -240,9 +240,6 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
                 viewDataButton.setVisibility(View.VISIBLE);
             });
         }
-
-
-
     }
 
     public class InitTask extends AsyncTask<Void, Void, Void> {
