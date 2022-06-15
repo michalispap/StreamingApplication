@@ -15,8 +15,10 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -33,6 +35,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
     int port;
     String channel;
     ArrayAdapter<String> listAdapter;
+    ListView listView;
 
     Publisher pub;
     Consumer cons;
@@ -211,40 +214,48 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
     public class Task extends AsyncTask<String, Void, Void> {
 
-        Address address = null;
+        Address address;
         String channelName;
         ArrayList<String> topicsArray = new ArrayList<>();
+        Intent intent;
+        Button registerButton = findViewById(R.id.registerBtn);
+        Button viewDataButton = findViewById(R.id.viewDataBtn);
 
         @Override
         protected Void doInBackground(String... strings) {
             channelName = strings[0];
             Broker.getBrokerList().forEach((k, v) -> topicsArray.addAll(v));
-
             return null;
         }
 
         @Override
         protected void onPostExecute(Void unused) {
             listAdapter = new ArrayAdapter<>(OptionsActivity.this, R.layout.activity_listview, topicsArray);
-            ListView listView = findViewById(R.id.topics_list);
+            listView = findViewById(R.id.topics_list);
             listView.setAdapter(listAdapter);
             listView.setVisibility(View.VISIBLE);
-            Button registerButton = findViewById(R.id.registerBtn);
-            Button viewDataButton = findViewById(R.id.viewDataBtn);
             listView.setOnItemClickListener((parent, view, position, id) -> {
-                /*String entry = (String) parent.getAdapter().getItem(position);
-                Intent intent = new Intent(OptionsActivity.this, TopicActivity.class);
+                String entry = (String) parent.getAdapter().getItem(position);
+                intent = new Intent(OptionsActivity.this, TopicActivity.class);
                 intent.putExtra("topic", entry);
-                startActivity(intent);*/
+                intent.putExtra("consumer", cons);
                 registerButton.setVisibility(View.VISIBLE);
                 viewDataButton.setVisibility(View.VISIBLE);
             });
+
+            viewDataButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View view) {
+                    startActivity(intent);
+                }
+            });
+
         }
+
     }
 
     public class InitTask extends AsyncTask<Void, Void, Void> {
 
-        Address address = null;
+        Address address;
         String channelName;
 
         @Override
@@ -265,7 +276,6 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
         @Override
         protected void onPostExecute(Void unused) {
-
         }
     }
 

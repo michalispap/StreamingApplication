@@ -1,5 +1,8 @@
 package com.example.streamingapplication;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -15,7 +18,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 
-public class Consumer{
+public class Consumer implements Parcelable {
 
     private Socket socket;
     private ServerSocket serverSocket;
@@ -26,7 +29,7 @@ public class Consumer{
 
     protected ArrayList<Address> brokers = new ArrayList<>(Arrays.asList(
             /// first random broker IP and Port
-            new Address("192.168.1.5", 6000)
+            new Address("192.168.1.7", 6000)
     ));
 
     public Consumer(Address _addr){
@@ -34,6 +37,23 @@ public class Consumer{
         init();
         pull();
     }
+
+    protected Consumer(Parcel in) {
+        topics = in.createStringArrayList();
+    }
+
+    public static final Creator<Consumer> CREATOR = new Creator<Consumer>() {
+        @Override
+        public Consumer createFromParcel(Parcel in) {
+            return new Consumer(in);
+        }
+
+        @Override
+        public Consumer[] newArray(int size) {
+            return new Consumer[size];
+        }
+    };
+
     public void init() {
         Runnable task = () ->{
             try {
@@ -187,8 +207,7 @@ public class Consumer{
                 }
             }catch(IOException e){
                 e.printStackTrace();
-            }
-            finally {
+            }finally {
                 try {
                     socketToReceive.close();
                 } catch (IOException e) {
@@ -201,5 +220,15 @@ public class Consumer{
 
     public void saveChunk(MultimediaFile chunk , File file) throws IOException {
         Files.write(file.toPath() , chunk.getVideoFileChunk() , StandardOpenOption.APPEND);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeStringList(topics);
     }
 }
