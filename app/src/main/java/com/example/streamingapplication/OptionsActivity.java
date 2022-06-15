@@ -225,7 +225,6 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         protected Void doInBackground(String... strings) {
             channelName = strings[0];
             Broker.getBrokerList().forEach((k, v) -> topicsArray.addAll(v));
-
             return null;
         }
 
@@ -239,7 +238,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
                 String entry = (String) parent.getAdapter().getItem(position);
                 intent = new Intent(OptionsActivity.this, TopicActivity.class);
                 intent.putExtra("topic", entry);
-                //intent.putExtra("consumer", cons);
+                intent.putExtra("consumer", cons);
                 registerButton.setVisibility(View.VISIBLE);
                 viewDataButton.setVisibility(View.VISIBLE);
             });
@@ -256,7 +255,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
     public class InitTask extends AsyncTask<Void, Void, Void> {
 
-        Address address = null;
+        Address address;
         String channelName;
 
         @Override
@@ -277,7 +276,6 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
         @Override
         protected void onPostExecute(Void unused) {
-
         }
     }
 
