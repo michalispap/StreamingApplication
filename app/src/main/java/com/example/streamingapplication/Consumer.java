@@ -89,7 +89,8 @@ public class Consumer implements Parcelable {
         Runnable task = () -> {
             try {
                 System.out.println("Thread register started ...");
-                AppNode.brokersList
+                //AppNode.brokersList
+                Broker.getBrokerList()
                         .forEach((k, t) ->
                         {
                             System.out.println(k + " " + t + "");
@@ -127,7 +128,8 @@ public class Consumer implements Parcelable {
         Runnable task = () ->{
           try{
               System.out.println("Thread Show Conversation Data started...");
-              AppNode.brokersList.forEach((broker, topics)->{
+              //AppNode.brokersList.forEach((broker, topics)->{
+              Broker.getBrokerList().forEach((broker, topics)-> {
                   if(topics.contains(hashtag)){
                       Socket socketToBroker = null;
                       try{

@@ -3,6 +3,7 @@ package com.example.streamingapplication;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -182,6 +183,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         ListView topicsList = findViewById(R.id.topics_list);
         Button registerButton = findViewById(R.id.registerBtn);
         Button viewDataButton = findViewById(R.id.viewDataBtn);
+        Button myTopics = findViewById(R.id.myTopicsBtn);
         if (item.equals("Publisher")) {
             textButton.setVisibility(View.VISIBLE);
             multimediaButton.setVisibility(View.VISIBLE);
@@ -191,6 +193,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             topicsList.setVisibility(View.GONE);
             registerButton.setVisibility(View.GONE);
             viewDataButton.setVisibility(View.GONE);
+            myTopics.setVisibility(View.GONE);
             //publisher stuff
         }
         else if (item.equals("Consumer")) {
@@ -205,11 +208,21 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
     public void updateBrokerInfo(View view) {
         Button updateBrokers = findViewById(R.id.updateBrokers);
-        Toast.makeText(this, updateBrokers.getText().toString(), Toast.LENGTH_SHORT).show();
+        new UpdateBrokerInfoTask().execute();
     }
 
     public void viewTopics(View view) {
+        Button myTopics = findViewById(R.id.myTopicsBtn);
+        myTopics.setVisibility(View.VISIBLE);
         new Task().execute(channel);
+    }
+
+    public void myTopics(View view) {
+        for (int i = 0; i < listView.getCount(); i++) {
+            if (cons.topics.contains((String) listView.getItemAtPosition(i))) {
+                listView.getChildAt(i).setBackgroundColor(Color.CYAN);
+            }
+        }
     }
 
     public class Task extends AsyncTask<String, Void, Void> {
@@ -220,6 +233,9 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         Intent intent;
         Button registerButton = findViewById(R.id.registerBtn);
         Button viewDataButton = findViewById(R.id.viewDataBtn);
+        String entry;
+        View previousSelectedItem;
+        View itemAtPosition;
 
         @Override
         protected Void doInBackground(String... strings) {
@@ -235,17 +251,36 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             listView.setAdapter(listAdapter);
             listView.setVisibility(View.VISIBLE);
             listView.setOnItemClickListener((parent, view, position, id) -> {
-                String entry = (String) parent.getAdapter().getItem(position);
+                entry = (String) parent.getAdapter().getItem(position);
+                itemAtPosition = view;
                 intent = new Intent(OptionsActivity.this, TopicActivity.class);
                 intent.putExtra("topic", entry);
                 intent.putExtra("consumer", cons);
                 registerButton.setVisibility(View.VISIBLE);
                 viewDataButton.setVisibility(View.VISIBLE);
+                if (previousSelectedItem != null) {
+                    previousSelectedItem.setBackgroundColor(Color.WHITE);
+                }
+                previousSelectedItem = view;
+                view.setBackgroundColor(Color.LTGRAY);
             });
 
             viewDataButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View view) {
                     startActivity(intent);
+                }
+            });
+
+            registerButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View view) {
+                    if (!cons.topics.contains(entry)) {
+                        cons.register(entry);
+                        //itemAtPosition.setBackgroundColor(Color.CYAN);
+                        Toast.makeText(OptionsActivity.this, "Registered on topic: " + entry, Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Toast.makeText(OptionsActivity.this, "Already registered on topic: " + entry, Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
 
@@ -276,6 +311,20 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
         @Override
         protected void onPostExecute(Void unused) {
+        }
+    }
+
+    public class UpdateBrokerInfoTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            pub.getBrokerList();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            Toast.makeText(OptionsActivity.this, "Broker Information Updated", Toast.LENGTH_SHORT).show();
         }
     }
 
