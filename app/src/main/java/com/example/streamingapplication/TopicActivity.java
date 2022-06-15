@@ -20,5 +20,6 @@ public class TopicActivity extends AppCompatActivity {
         String topic = String.valueOf(b.get("topic"));
         TextView topicName = findViewById(R.id.topicName);
         topicName.setText(topic);
+        consumer.showConversationData(topic);
     }
 }

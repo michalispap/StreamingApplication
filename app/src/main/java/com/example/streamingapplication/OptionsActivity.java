@@ -214,7 +214,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
     public class Task extends AsyncTask<String, Void, Void> {
 
-        Address address = null;
+        Address address;
         String channelName;
         ArrayList<String> topicsArray = new ArrayList<>();
         Intent intent;
