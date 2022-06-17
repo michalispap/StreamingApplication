@@ -24,6 +24,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.apache.commons.math3.analysis.function.Add;
+
 import java.io.File;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -296,6 +298,8 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
                 intent = new Intent(OptionsActivity.this, TopicActivity.class);
                 intent.putExtra("topic", entry);
                 intent.putExtra("consumer", cons);
+                intent.putExtra("addr" , cons.addr);
+                Log.d("myipcons.addr" , String.valueOf(cons.addr));
                 registerButton.setVisibility(View.VISIBLE);
                 viewDataButton.setVisibility(View.VISIBLE);
                 if (previousSelectedItem != null) {
@@ -334,15 +338,16 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
         @Override
         protected Void doInBackground(Void... voids) {
-            final DatagramSocket dSocket;
-            try {
-                dSocket = new DatagramSocket();
-                dSocket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-                address = new Address(dSocket.getLocalAddress().getHostAddress(), port);
-                Log.d("ip address", dSocket.getLocalAddress().getHostAddress());
-            } catch (SocketException | UnknownHostException e) {
-                e.printStackTrace();
-            }
+//            final DatagramSocket dSocket;
+//            try {
+//                dSocket = new DatagramSocket();
+//                dSocket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+//                address = new Address(dSocket.getLocalAddress().getHostAddress(), port);
+//                Log.d("ip address", dSocket.getLocalAddress().getHostAddress());
+//            } catch (SocketException | UnknownHostException e) {
+//                e.printStackTrace();
+//            }
+            address = new Address("192.168.1.5" , port);
             pub = new Publisher(address, channelName);
             cons = new Consumer(address);
 

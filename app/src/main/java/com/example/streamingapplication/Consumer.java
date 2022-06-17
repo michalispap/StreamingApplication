@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -30,13 +31,13 @@ public class Consumer implements Parcelable {
 
     protected ArrayList<Address> brokers = new ArrayList<>(Arrays.asList(
             /// first random broker IP and Port
-            new Address("192.168.1.7", 6000)
+            new Address("192.168.1.5", 6000)
     ));
 
     public Consumer(Address _addr){
         this.addr = _addr;
         init();
-        //pull();
+        pull();
     }
 
     protected Consumer(Parcel in) {
@@ -161,18 +162,21 @@ public class Consumer implements Parcelable {
     }
 
     public void pull(){
+
         Runnable task =() ->{
             try{
                 Log.d("insidePull", "inside pull()");
-                serverSocket = new ServerSocket(addr.getPort()+1);
+                serverSocket = new ServerSocket(addr.getPort()+1); // server socket at ip 127.0.0.1
+                // new ServerSocket(addr.getPort()+1 , 100 , InetAddress.getByName("192.168.1.5"));
                 System.out.println("\nServer Socket Open...");
+                Log.d("insidePull", "inside try");
                 while(true){
 
                     socketToReceive = serverSocket.accept();
                     System.out.println("consumer socket.accept()\n");
                     Runnable _task = () ->{
                         try{
-                            Log.d("insidePull", "inside try");
+
                             ArrayList<Date> datesToInsert = new ArrayList<>();
                             ObjectOutputStream out = new ObjectOutputStream(socketToReceive.getOutputStream());
                             ObjectInputStream in = new ObjectInputStream(socketToReceive.getInputStream());
