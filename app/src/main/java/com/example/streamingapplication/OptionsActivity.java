@@ -3,7 +3,10 @@ package com.example.streamingapplication;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -20,11 +23,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.File;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class OptionsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -81,6 +86,14 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         }
         else if (ButtonText.equals("Send")) {
             Toast.makeText(this, message.getText().toString(), Toast.LENGTH_SHORT).show();
+
+            //send text
+            Date dateCreated = new Date();
+            ArrayList<String> hashTags = new ArrayList();
+            hashTags.add("android_topic"); //temporary (testing)
+            pub.setFileCollection(message.getText().toString(), hashTags);
+            pub.sendFile(message.getText().toString(), hashTags, dateCreated);
+
             message.setVisibility(View.GONE);
             textButton.setText("Text");
         }
@@ -171,6 +184,32 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && (requestCode == GALLERY_PICK_CODE || requestCode == REQUEST_IMAGE_CAPTURE || requestCode == REQUEST_VIDEO_CAPTURE)) {
             Toast.makeText(this, "Success!", Toast.LENGTH_SHORT).show();
+        }
+
+        if (resultCode == RESULT_OK && (requestCode == GALLERY_PICK_CODE)) {
+            //store in File
+            Uri uri = data.getData();
+            String path = getPath(uri);
+            File file = new File(path);
+            Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public String getPath(Uri uri) {
+        Cursor cursor = null;
+        try {
+            String[] projection = {MediaStore.Images.Media.DATA};
+            cursor = getContentResolver().query(uri, projection, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(projection[0]);
+            String filePath = cursor.getString(columnIndex);
+            BitmapFactory.decodeFile(filePath);
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 
@@ -275,7 +314,6 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
                 public void onClick(View view) {
                     if (!cons.topics.contains(entry)) {
                         cons.register(entry);
-                        //itemAtPosition.setBackgroundColor(Color.CYAN);
                         Toast.makeText(OptionsActivity.this, "Registered on topic: " + entry, Toast.LENGTH_SHORT).show();
                     }
                     else {
