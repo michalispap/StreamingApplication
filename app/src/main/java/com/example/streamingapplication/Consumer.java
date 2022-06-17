@@ -166,14 +166,15 @@ public class Consumer implements Parcelable {
         Runnable task =() ->{
             try{
                 Log.d("insidePull", "inside pull()");
-                serverSocket = new ServerSocket(addr.getPort()+1); // server socket at ip 127.0.0.1
-                // new ServerSocket(addr.getPort()+1 , 100 , InetAddress.getByName("192.168.1.5"));
+                serverSocket = new ServerSocket(addr.getPort()+1);
+                // server socket at ip 127.0.0.1
                 System.out.println("\nServer Socket Open...");
-                Log.d("insidePull", "inside try");
+
                 while(true){
 
                     socketToReceive = serverSocket.accept();
                     System.out.println("consumer socket.accept()\n");
+                    Log.d("insidePull", "accept()");
                     Runnable _task = () ->{
                         try{
 
@@ -198,10 +199,12 @@ public class Consumer implements Parcelable {
                                 Files.createFile(file.getAbsoluteFile().toPath());
 
                                 while(true){
+
                                     Value chunkInValue = (Value)in.readObject();
+                                    System.out.println("GOT CHUNK");
                                     MultimediaFile chunk = chunkInValue.getMultimediaFile();
                                     saveChunk(chunk,file);
-                                    System.out.println("GOT CHUNK");
+
                                     if(chunkInValue.isLast){
                                         System.out.println("Received whole File...");
                                         break;
