@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -338,6 +339,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
                 dSocket = new DatagramSocket();
                 dSocket.connect(InetAddress.getByName("8.8.8.8"), 10002);
                 address = new Address(dSocket.getLocalAddress().getHostAddress(), port);
+                Log.d("ip address", dSocket.getLocalAddress().getHostAddress());
             } catch (SocketException | UnknownHostException e) {
                 e.printStackTrace();
             }

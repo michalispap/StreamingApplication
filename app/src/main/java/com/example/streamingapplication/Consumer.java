@@ -2,6 +2,7 @@ package com.example.streamingapplication;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class Consumer implements Parcelable {
     public Consumer(Address _addr){
         this.addr = _addr;
         init();
-        pull();
+        //pull();
     }
 
     protected Consumer(Parcel in) {
@@ -104,6 +105,7 @@ public class Consumer implements Parcelable {
 
                                     service_out.writeObject(new Value(this.addr,hashtag , "something", SenderType.CONSUMER));
                                     service_out.flush();
+                                    Log.d("insidePull", "register");
 
                                 }catch (Exception e) {
                                     e.printStackTrace();
@@ -161,6 +163,7 @@ public class Consumer implements Parcelable {
     public void pull(){
         Runnable task =() ->{
             try{
+                Log.d("insidePull", "inside pull()");
                 serverSocket = new ServerSocket(addr.getPort()+1);
                 System.out.println("\nServer Socket Open...");
                 while(true){
@@ -169,21 +172,25 @@ public class Consumer implements Parcelable {
                     System.out.println("consumer socket.accept()\n");
                     Runnable _task = () ->{
                         try{
+                            Log.d("insidePull", "inside try");
                             ArrayList<Date> datesToInsert = new ArrayList<>();
                             ObjectOutputStream out = new ObjectOutputStream(socketToReceive.getOutputStream());
                             ObjectInputStream in = new ObjectInputStream(socketToReceive.getInputStream());
 
                             Value hashAndDateInValue = (Value)in.readObject();
                             String topic = hashAndDateInValue.getTopic();
+                            Log.d("insidePull", topic);
                             Date dateCreated = hashAndDateInValue.getDateCreated();
                             String typeOfFile = hashAndDateInValue.getType();
                             System.out.println("Receiving topic:  "+topic);
-                            String home = System.getProperty("user.home");
+                            //String home = System.getProperty("user.home");
+                            String home = "/storage/emulated/0/Download/";
                             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy HH-mm-ss");
+                            Log.d("insidePull", home);
 
-                            if(Files.notExists(Paths.get(home + "/Downloads/" + topic + "withDate" + dateFormat.format(dateCreated) + typeOfFile))){
+                            if(Files.notExists(Paths.get(home + topic + "withDate" + dateFormat.format(dateCreated) + typeOfFile))){
 
-                                File file = new File(home + "/Downloads/" + topic + "withDate" + dateFormat.format(dateCreated) + typeOfFile);
+                                File file = new File(home + topic + "withDate" + dateFormat.format(dateCreated) + typeOfFile);
                                 Files.createFile(file.getAbsoluteFile().toPath());
 
                                 while(true){
