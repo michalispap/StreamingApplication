@@ -37,6 +37,12 @@ public class TopicActivity extends AppCompatActivity {
         TextView topicName = findViewById(R.id.topicName);
         topicName.setText(topic);
         consumer.showConversationData(topic);
+        try {
+            // waiting for chunks
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Log.d("myip" , String.valueOf(consumer.addr));
 
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
