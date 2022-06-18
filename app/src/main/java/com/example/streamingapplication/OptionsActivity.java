@@ -43,6 +43,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
     ListView listView;
 
     Publisher pub;
+    ArrayList<String> hashtags = new ArrayList<>();
     Consumer cons;
 
     FileObserver fileObserver;
@@ -214,6 +215,11 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             Uri uri = data.getData();
             String path = getPath(uri);
             File file = new File(path);
+            hashtags.add("onehashtag");
+            Date dateCreated = new Date();
+            Log.d("video" , path);
+            pub.setFileCollection(path , hashtags);
+            pub.sendFile(path , hashtags , dateCreated);
             Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
         }
     }

@@ -1,5 +1,7 @@
 package com.example.streamingapplication;
 
+import android.os.Environment;
+
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -9,12 +11,14 @@ import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
@@ -211,42 +215,26 @@ public class Publisher {
                 System.out.println("GenerateChunks for video or photo");
                 type = content.substring(content.length()-4);
                 System.out.println(type);
-                int flag = 0;
-                File file = null;
-                String fileName;
-                File directory = new File("data");
-                String[] fileList = directory.list();
-                if (fileList == null) {
-                    System.out.println("Empty directory");
-                }
-                else {
-                    System.out.println();
-                    for (int i = 0; i < fileList.length; i++) {
-                        fileName = fileList[i];
-                        if (fileName.equalsIgnoreCase(content)) { //file found
-                            file = new File(directory+"\\"+fileName);
-                            flag = 1;
-                        }
-                    }
-                }
-                if (flag == 0) { //file not found
-                    System.out.println(content + " not found");
-                }else {
-                    chunks = generateChunks(file);
-                }
+                File file = new File(content); // content is the absolute path of the file
+
+                chunks = generateChunks(file);
             }
             else {
                 System.out.println("GenerateChunks for text");
                 try {
                     type = ".txt";
-                    String home = "/storage/emulated/0/Download/";
-                    String fileName = content.substring(0,5);
-                    File file = new File(home + fileName + ".txt");
-                    file.createNewFile();
-                    FileWriter myWriter = new FileWriter(file);
-                    myWriter.write(content);
-                    myWriter.close();
-                    //metaMap = getMetadata(file.getAbsolutePath());
+                    File file = new File("/storage/emulated/0/Download/Testing" + content+ ".txt");
+                    if(!file.exists()){
+                        try{
+                            file.createNewFile();
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                    FileOutputStream writer = new FileOutputStream(file);
+                    writer.write(content.getBytes());
+                    writer.flush();
+                    writer.close();
                     chunks = generateChunks(file);
 
                 } catch (Exception e) {
