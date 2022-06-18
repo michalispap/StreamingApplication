@@ -1,7 +1,5 @@
 package com.example.streamingapplication;
 
-import android.os.Environment;
-
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -12,13 +10,11 @@ import org.xml.sax.SAXException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
@@ -36,7 +32,7 @@ public class Publisher {
     private HashMap<String,ArrayList<String>> FileCollection = new HashMap<>();
     protected ArrayList<Address> brokers = new ArrayList<>(Arrays.asList(
             /// first random broker IP and Port
-            new Address("192.168.1.5", 6000)
+            new Address("192.168.1.7", 6000)
     ));
 
     /// CONSTRUCTORS
@@ -223,7 +219,7 @@ public class Publisher {
                 System.out.println("GenerateChunks for text");
                 try {
                     type = ".txt";
-                    File file = new File("/storage/emulated/0/Download/Testing" + content+ ".txt");
+                    File file = new File("/storage/emulated/0/Download/Testing/" + content + ".txt");
                     if(!file.exists()){
                         try{
                             file.createNewFile();

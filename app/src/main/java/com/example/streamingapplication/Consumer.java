@@ -30,7 +30,7 @@ public class Consumer implements Parcelable {
 
     protected ArrayList<Address> brokers = new ArrayList<>(Arrays.asList(
             /// first random broker IP and Port
-            new Address("192.168.1.5", 6000)
+            new Address("192.168.1.7", 6000)
     ));
 
     public Consumer(Address _addr){

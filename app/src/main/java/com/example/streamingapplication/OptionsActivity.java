@@ -222,6 +222,13 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             pub.sendFile(path , hashtags , dateCreated);
             Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
         }
+
+        if (resultCode == RESULT_OK && (requestCode == REQUEST_IMAGE_CAPTURE)) {
+
+        }
+        if (resultCode == RESULT_OK && (requestCode == REQUEST_VIDEO_CAPTURE)) {
+
+        }
     }
 
     public String getPath(Uri uri) {
@@ -365,7 +372,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         @Override
         protected Void doInBackground(Void... voids) {
 
-            address = new Address("192.168.1.5" , port);
+            address = new Address("192.168.1.7" , port);
             pub = new Publisher(address, channelName);
             cons = new Consumer(address);
 
