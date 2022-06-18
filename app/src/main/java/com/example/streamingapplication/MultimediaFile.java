@@ -17,6 +17,7 @@ public class MultimediaFile implements Serializable {
     List<byte[]> File = new ArrayList<>();
 
     public long Count = 0;
+    private static final long serialVersionUID = 2007333342745327391L;
 
     String text;
 

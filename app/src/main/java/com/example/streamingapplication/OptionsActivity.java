@@ -3,9 +3,14 @@ package com.example.streamingapplication;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,11 +24,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.apache.commons.math3.analysis.function.Add;
+
+import java.io.File;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class OptionsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -80,6 +89,14 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         }
         else if (ButtonText.equals("Send")) {
             Toast.makeText(this, message.getText().toString(), Toast.LENGTH_SHORT).show();
+
+            //send text
+            Date dateCreated = new Date();
+            ArrayList<String> hashTags = new ArrayList();
+            hashTags.add("android_topic"); //temporary (testing)
+            pub.setFileCollection(message.getText().toString(), hashTags);
+            pub.sendFile(message.getText().toString(), hashTags, dateCreated);
+
             message.setVisibility(View.GONE);
             textButton.setText("Text");
         }
@@ -171,6 +188,32 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         if (resultCode == RESULT_OK && (requestCode == GALLERY_PICK_CODE || requestCode == REQUEST_IMAGE_CAPTURE || requestCode == REQUEST_VIDEO_CAPTURE)) {
             Toast.makeText(this, "Success!", Toast.LENGTH_SHORT).show();
         }
+
+        if (resultCode == RESULT_OK && (requestCode == GALLERY_PICK_CODE)) {
+            //store in File
+            Uri uri = data.getData();
+            String path = getPath(uri);
+            File file = new File(path);
+            Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public String getPath(Uri uri) {
+        Cursor cursor = null;
+        try {
+            String[] projection = {MediaStore.Images.Media.DATA};
+            cursor = getContentResolver().query(uri, projection, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(projection[0]);
+            String filePath = cursor.getString(columnIndex);
+            BitmapFactory.decodeFile(filePath);
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     public void Choice(View view) {
@@ -182,6 +225,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         ListView topicsList = findViewById(R.id.topics_list);
         Button registerButton = findViewById(R.id.registerBtn);
         Button viewDataButton = findViewById(R.id.viewDataBtn);
+        Button myTopics = findViewById(R.id.myTopicsBtn);
         if (item.equals("Publisher")) {
             textButton.setVisibility(View.VISIBLE);
             multimediaButton.setVisibility(View.VISIBLE);
@@ -191,6 +235,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             topicsList.setVisibility(View.GONE);
             registerButton.setVisibility(View.GONE);
             viewDataButton.setVisibility(View.GONE);
+            myTopics.setVisibility(View.GONE);
             //publisher stuff
         }
         else if (item.equals("Consumer")) {
@@ -205,11 +250,21 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
     public void updateBrokerInfo(View view) {
         Button updateBrokers = findViewById(R.id.updateBrokers);
-        Toast.makeText(this, updateBrokers.getText().toString(), Toast.LENGTH_SHORT).show();
+        new UpdateBrokerInfoTask().execute();
     }
 
     public void viewTopics(View view) {
+        Button myTopics = findViewById(R.id.myTopicsBtn);
+        myTopics.setVisibility(View.VISIBLE);
         new Task().execute(channel);
+    }
+
+    public void myTopics(View view) {
+        for (int i = 0; i < listView.getCount(); i++) {
+            if (cons.topics.contains((String) listView.getItemAtPosition(i))) {
+                listView.getChildAt(i).setBackgroundColor(Color.CYAN);
+            }
+        }
     }
 
     public class Task extends AsyncTask<String, Void, Void> {
@@ -220,6 +275,9 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         Intent intent;
         Button registerButton = findViewById(R.id.registerBtn);
         Button viewDataButton = findViewById(R.id.viewDataBtn);
+        String entry;
+        View previousSelectedItem;
+        View itemAtPosition;
 
         @Override
         protected Void doInBackground(String... strings) {
@@ -235,17 +293,37 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             listView.setAdapter(listAdapter);
             listView.setVisibility(View.VISIBLE);
             listView.setOnItemClickListener((parent, view, position, id) -> {
-                String entry = (String) parent.getAdapter().getItem(position);
+                entry = (String) parent.getAdapter().getItem(position);
+                itemAtPosition = view;
                 intent = new Intent(OptionsActivity.this, TopicActivity.class);
                 intent.putExtra("topic", entry);
                 intent.putExtra("consumer", cons);
+                intent.putExtra("addr" , cons.addr);
+                Log.d("myipcons.addr" , String.valueOf(cons.addr));
                 registerButton.setVisibility(View.VISIBLE);
                 viewDataButton.setVisibility(View.VISIBLE);
+                if (previousSelectedItem != null) {
+                    previousSelectedItem.setBackgroundColor(Color.WHITE);
+                }
+                previousSelectedItem = view;
+                view.setBackgroundColor(Color.LTGRAY);
             });
 
             viewDataButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View view) {
                     startActivity(intent);
+                }
+            });
+
+            registerButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View view) {
+                    if (!cons.topics.contains(entry)) {
+                        cons.register(entry);
+                        Toast.makeText(OptionsActivity.this, "Registered on topic: " + entry, Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Toast.makeText(OptionsActivity.this, "Already registered on topic: " + entry, Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
 
@@ -260,14 +338,16 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
         @Override
         protected Void doInBackground(Void... voids) {
-            final DatagramSocket dSocket;
-            try {
-                dSocket = new DatagramSocket();
-                dSocket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-                address = new Address(dSocket.getLocalAddress().getHostAddress(), port);
-            } catch (SocketException | UnknownHostException e) {
-                e.printStackTrace();
-            }
+//            final DatagramSocket dSocket;
+//            try {
+//                dSocket = new DatagramSocket();
+//                dSocket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+//                address = new Address(dSocket.getLocalAddress().getHostAddress(), port);
+//                Log.d("ip address", dSocket.getLocalAddress().getHostAddress());
+//            } catch (SocketException | UnknownHostException e) {
+//                e.printStackTrace();
+//            }
+            address = new Address("192.168.1.5" , port);
             pub = new Publisher(address, channelName);
             cons = new Consumer(address);
 
@@ -276,6 +356,20 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
         @Override
         protected void onPostExecute(Void unused) {
+        }
+    }
+
+    public class UpdateBrokerInfoTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            pub.getBrokerList();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            Toast.makeText(OptionsActivity.this, "Broker Information Updated", Toast.LENGTH_SHORT).show();
         }
     }
 
