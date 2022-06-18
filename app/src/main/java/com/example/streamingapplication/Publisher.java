@@ -32,7 +32,7 @@ public class Publisher {
     private HashMap<String,ArrayList<String>> FileCollection = new HashMap<>();
     protected ArrayList<Address> brokers = new ArrayList<>(Arrays.asList(
             /// first random broker IP and Port
-            new Address("192.168.1.7", 6000)
+            new Address("192.168.1.5", 6000)
     ));
 
     /// CONSTRUCTORS
@@ -239,14 +239,14 @@ public class Publisher {
                 System.out.println("GenerateChunks for text");
                 try {
                     type = ".txt";
-                    String home = System.getProperty("user.home");
+                    String home = "/storage/emulated/0/Download/";
                     String fileName = content.substring(0,5);
-                    File file = new File("data/" + fileName + ".txt");
+                    File file = new File(home + fileName + ".txt");
                     file.createNewFile();
                     FileWriter myWriter = new FileWriter(file);
                     myWriter.write(content);
                     myWriter.close();
-                    metaMap = getMetadata(file.getAbsolutePath());
+                    //metaMap = getMetadata(file.getAbsolutePath());
                     chunks = generateChunks(file);
 
                 } catch (Exception e) {

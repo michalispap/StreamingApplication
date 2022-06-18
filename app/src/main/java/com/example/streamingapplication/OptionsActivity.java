@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.FileObserver;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -22,15 +23,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.apache.commons.math3.analysis.function.Add;
-
 import java.io.File;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -48,6 +44,8 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
     Publisher pub;
     Consumer cons;
+
+    FileObserver fileObserver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +65,28 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
         new InitTask().execute();
+        new FileObserver("/storage/emulated/0/Download/") {
+            @Override
+            public void onEvent(int event, String path) {
+                if (event == FileObserver.CREATE)
+                    Toast.makeText(OptionsActivity.this, "File added to your registered topics...", Toast.LENGTH_SHORT).show();
+            }
+        }.startWatching();
+
+        fileObserver = new FileObserver("/storage/emulated/0/Download/") {
+            @Override
+            public void onEvent(int i, @Nullable String path) {
+                if((path != null) && (i == 256)) {
+                    runOnUiThread(new Runnable() {
+                        public void run()
+                        {
+                            Toast.makeText(OptionsActivity.this, "New file added to your registered topics!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        };
+        fileObserver.startWatching();
 
     }
 
@@ -338,15 +358,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
         @Override
         protected Void doInBackground(Void... voids) {
-//            final DatagramSocket dSocket;
-//            try {
-//                dSocket = new DatagramSocket();
-//                dSocket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-//                address = new Address(dSocket.getLocalAddress().getHostAddress(), port);
-//                Log.d("ip address", dSocket.getLocalAddress().getHostAddress());
-//            } catch (SocketException | UnknownHostException e) {
-//                e.printStackTrace();
-//            }
+
             address = new Address("192.168.1.5" , port);
             pub = new Publisher(address, channelName);
             cons = new Consumer(address);

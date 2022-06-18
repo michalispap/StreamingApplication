@@ -30,7 +30,7 @@ public class Consumer implements Parcelable {
 
     protected ArrayList<Address> brokers = new ArrayList<>(Arrays.asList(
             /// first random broker IP and Port
-            new Address("192.168.1.7", 6000)
+            new Address("192.168.1.5", 6000)
     ));
 
     public Consumer(Address _addr){
@@ -164,6 +164,7 @@ public class Consumer implements Parcelable {
 
         Runnable task =() ->{
             try{
+
                 Log.d("insidePull", "inside pull()");
                 serverSocket = new ServerSocket(addr.getPort()+1);
                 // server socket at ip 127.0.0.1
