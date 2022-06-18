@@ -32,7 +32,7 @@ public class Publisher {
     private HashMap<String,ArrayList<String>> FileCollection = new HashMap<>();
     protected ArrayList<Address> brokers = new ArrayList<>(Arrays.asList(
             /// first random broker IP and Port
-            new Address("192.168.1.7", 6000)
+            new Address("192.168.1.5", 6000)
     ));
 
     /// CONSTRUCTORS
