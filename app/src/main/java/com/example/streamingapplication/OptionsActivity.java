@@ -43,7 +43,7 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
     ListView listView;
 
     Publisher pub;
-    ArrayList<String> hashtags = new ArrayList<>();
+    ArrayList<String> hashtags;
     Consumer cons;
 
     FileObserver fileObserver;
@@ -91,6 +91,24 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
 
     }
 
+    public void hashTag(View view) {
+        Button hashtagBtn = findViewById(R.id.hashtagBtn);
+        EditText hashtagText = findViewById(R.id.hashtagText);
+        String buttonText = hashtagBtn.getText().toString();
+        if (buttonText.equals("Hashtag")) {
+            hashtagText.setVisibility(View.VISIBLE);
+            hashtagBtn.setText("Send");
+        }
+        else if (buttonText.equals("Send")) {
+            hashtagText.setVisibility(View.GONE);
+            hashtagBtn.setText("Hashtag");
+            Toast.makeText(this, hashtagText.getText().toString(), Toast.LENGTH_SHORT).show();
+            hashtags = new ArrayList<>();
+            hashtags.add(hashtagText.getText().toString());
+        }
+
+    }
+
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
          item = parent.getItemAtPosition(position).toString();
@@ -110,14 +128,9 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         }
         else if (ButtonText.equals("Send")) {
             Toast.makeText(this, message.getText().toString(), Toast.LENGTH_SHORT).show();
-
-            //send text
             Date dateCreated = new Date();
-            ArrayList<String> hashTags = new ArrayList();
-            hashTags.add("android_topic"); //temporary (testing)
-            pub.setFileCollection(message.getText().toString(), hashTags);
-            pub.sendFile(message.getText().toString(), hashTags, dateCreated);
-
+            pub.setFileCollection(message.getText().toString(), hashtags);
+            pub.sendFile(message.getText().toString(), hashtags, dateCreated);
             message.setVisibility(View.GONE);
             textButton.setText("Text");
         }
@@ -211,23 +224,34 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         }
 
         if (resultCode == RESULT_OK && (requestCode == GALLERY_PICK_CODE)) {
-            //store in File
             Uri uri = data.getData();
             String path = getPath(uri);
             File file = new File(path);
-            hashtags.add("onehashtag");
             Date dateCreated = new Date();
-            Log.d("video" , path);
-            pub.setFileCollection(path , hashtags);
-            pub.sendFile(path , hashtags , dateCreated);
+            pub.setFileCollection(path, hashtags);
+            pub.sendFile(path, hashtags, dateCreated);
             Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
         }
 
-        if (resultCode == RESULT_OK && (requestCode == REQUEST_IMAGE_CAPTURE)) {
+        /*if (resultCode == RESULT_OK && (requestCode == REQUEST_IMAGE_CAPTURE)) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            File file = new File("/storage/emulated/0/Download/Testing/");
+            OutputStream os = null;
+            try {
+                os = new BufferedOutputStream(new FileOutputStream(file));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 1000, os);
+            try {
+                os.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }*/
 
-        }
         if (resultCode == RESULT_OK && (requestCode == REQUEST_VIDEO_CAPTURE)) {
-
         }
     }
 
@@ -259,6 +283,8 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
         Button registerButton = findViewById(R.id.registerBtn);
         Button viewDataButton = findViewById(R.id.viewDataBtn);
         Button myTopics = findViewById(R.id.myTopicsBtn);
+        Button hashtagBtn = findViewById(R.id.hashtagBtn);
+        EditText hashtagText = findViewById(R.id.hashtagText);
         if (item.equals("Publisher")) {
             textButton.setVisibility(View.VISIBLE);
             multimediaButton.setVisibility(View.VISIBLE);
@@ -269,7 +295,8 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             registerButton.setVisibility(View.GONE);
             viewDataButton.setVisibility(View.GONE);
             myTopics.setVisibility(View.GONE);
-            //publisher stuff
+            hashtagBtn.setVisibility(View.VISIBLE);
+            hashtagText.setVisibility(View.GONE);
         }
         else if (item.equals("Consumer")) {
             textButton.setVisibility(View.GONE);
@@ -277,7 +304,8 @@ public class OptionsActivity extends AppCompatActivity implements AdapterView.On
             cameraButton.setVisibility(View.GONE);
             cameraVideoButton.setVisibility(View.GONE);
             topicsButton.setVisibility(View.VISIBLE);
-            //publisher stuff
+            hashtagBtn.setVisibility(View.GONE);
+            hashtagText.setVisibility(View.GONE);
         }
     }
 
